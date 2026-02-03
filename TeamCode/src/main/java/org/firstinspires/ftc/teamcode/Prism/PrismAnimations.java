@@ -22,6 +22,8 @@
 
 package org.firstinspires.ftc.teamcode.Prism;
 
+import androidx.annotation.ColorInt;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.TimeUnit;
@@ -50,6 +52,62 @@ public class PrismAnimations {
         AnimationType(int animationType){
             this.AnimationTypeIndex = animationType;
         }
+    }
+
+    private static class Color {
+        final int red;
+        final int green;
+        final int blue;
+
+        Color(int red, int green, int blue)
+        {
+            this.red = Math.min(red, 255);
+            this.green = Math.min(green, 255);
+            this.blue = Math.min(blue, 255);
+        }
+
+        Color(@ColorInt int color)
+        {
+            this.red = android.graphics.Color.red(color);
+            this.green = android.graphics.Color.green(color);
+            this.blue = android.graphics.Color.blue(color);
+        }
+
+        int toColorInt()
+        {
+            return android.graphics.Color.rgb(red, green, blue);
+        }
+
+        @Override
+        public String toString()
+        {
+            return String.format("%d, %d, %d", red, green, blue);
+        }
+
+        static final Color RED         = new Color(255, 0,   0);
+        static final Color GREEN       = new Color(0,   255, 0);
+        static final Color CYAN        = new Color(0,   255, 255);
+        static final Color BLUE        = new Color(0,   0,   255);
+        static final Color WHITE       = new Color(255, 255, 255);
+        static final Color TRANSPARENT = new Color(0,   0,   0);
+    }
+    private static Color[] toColorArray(@ColorInt int[] colorIntArray)
+    {
+        Color[] colorArray = new Color[colorIntArray.length];
+        for (int i = 0; i < colorIntArray.length; i++)
+        {
+            colorArray[i] = new Color(colorIntArray[i]);
+        }
+        return colorArray;
+    }
+    private static @ColorInt int[] toColorIntArray(Color[] colorArray)
+    {
+        @ColorInt int[] colorIntArray = new int[colorArray.length];
+        for (int i = 0; i < colorArray.length; i++)
+        {
+            colorIntArray[i] = colorArray[i].toColorInt();
+        }
+        return colorIntArray;
     }
 
     public static abstract class AnimationBase {
@@ -239,19 +297,19 @@ public class PrismAnimations {
         private int primaryColorPeriod = 1000;
 
         public Blink(){ super(AnimationType.BLINK); }
-        public Blink(Color primaryColor) { 
+        public Blink(@ColorInt int primaryColor) {
             this();
-            this.primaryColor = primaryColor;
+            this.primaryColor = new Color(primaryColor);
         }
-        public Blink(Color primaryColor, Color secondaryColor) { 
+        public Blink(@ColorInt int primaryColor, @ColorInt int secondaryColor) {
             this(primaryColor);
-            this.secondaryColor = secondaryColor;
+            this.secondaryColor = new Color(secondaryColor);
         }
-        public Blink(Color primaryColor, Color secondaryColor, int period) { 
+        public Blink(@ColorInt int primaryColor, @ColorInt int secondaryColor, int period) {
             this(primaryColor, secondaryColor);
             this.period = period;
         }
-        public Blink(Color primaryColor, Color secondaryColor, int period, int primaryColorPeriod) { 
+        public Blink(@ColorInt int primaryColor, @ColorInt int secondaryColor, int period, int primaryColorPeriod) {
             this(primaryColor, secondaryColor, period);
             this.primaryColorPeriod = primaryColorPeriod;
         }
@@ -270,8 +328,8 @@ public class PrismAnimations {
         public void setPeriod(int duration, TimeUnit timeUnit){
             this.period = Math.toIntExact(timeUnit.toMillis(duration));
         }
-        public void setPrimaryColor(Color color)   { primaryColor = color;   }
-        public void setSecondaryColor(Color color) { secondaryColor = color; }
+        public void setPrimaryColor(@ColorInt int color)   { primaryColor = new Color(color);   }
+        public void setSecondaryColor(@ColorInt int color) { secondaryColor = new Color(color); }
         public void setPrimaryColor(int red, int green, int blue)   { primaryColor = new Color(red, green, blue);   }
         public void setSecondaryColor(int red, int green, int blue) { secondaryColor = new Color(red, green, blue); }
         /**
@@ -290,8 +348,8 @@ public class PrismAnimations {
         }
 
         public int getPeriod()             { return period;             }
-        public Color getPrimaryColor()     { return primaryColor;       }
-        public Color getSecondaryColor()   { return secondaryColor;     }
+        public @ColorInt int getPrimaryColor()     { return primaryColor.toColorInt();       }
+        public @ColorInt int getSecondaryColor()   { return secondaryColor.toColorInt();     }
         public int getPrimaryColorPeriod() { return primaryColorPeriod; }
 
         @Override
@@ -325,17 +383,17 @@ public class PrismAnimations {
         }
 
         public DroidScan(){ super(AnimationType.DROID_SCAN); }
-        public DroidScan(Color primaryColor) {
+        public DroidScan(@ColorInt int primaryColor) {
             this();
-            this.primaryColor = primaryColor;
+            this.primaryColor = new Color(primaryColor);
         }
-        public DroidScan(Color primaryColor, Color secondaryColor) {
+        public DroidScan(@ColorInt int primaryColor, @ColorInt int secondaryColor) {
             this(primaryColor);
-            this.secondaryColor = secondaryColor;
+            this.secondaryColor = new Color(secondaryColor);
         }
 
-        public void setSecondaryColor(Color color)        { this.secondaryColor = color;  }
-        public void setPrimaryColor(Color color)          { this.primaryColor = color;    }
+        public void setSecondaryColor(@ColorInt int color)        { this.secondaryColor = new Color(color);  }
+        public void setPrimaryColor(@ColorInt int color)          { this.primaryColor = new Color(color);    }
 
         /**
          * Sets the speed of the animation
@@ -356,8 +414,8 @@ public class PrismAnimations {
         public void setTrailWidth(int trailWidth)         { this.trailWidth = trailWidth; }
         public void setDroidScanStyle(DroidScanStyle style) { this.style = style;           }
 
-        public Color getSecondaryColor()        { return secondaryColor; }
-        public Color getPrimaryColor()          { return primaryColor;   }
+        public @ColorInt int getSecondaryColor()        { return secondaryColor.toColorInt(); }
+        public @ColorInt int getPrimaryColor()          { return primaryColor.toColorInt();   }
         public float getSpeed()                 { return speed;          }
         public int getEyeWidth()                { return eyeWidth;       }
         public int getTrailWidth()              { return trailWidth;     }
@@ -410,14 +468,14 @@ public class PrismAnimations {
             this.period = Math.toIntExact(timeUnit.toMillis(duration));
         }
         public void setPoliceLightsStyle(PoliceLightsStyle style){this.style = style;}
-        public void setPrimaryColor(Color color){this.red = color;}
-        public void setSecondaryColor(Color color){this.white = color;}
-        public void setTertiaryColor(Color color){this.blue = color;}
+        public void setPrimaryColor(@ColorInt int color){this.red = new Color(color);}
+        public void setSecondaryColor(@ColorInt int color){this.white = new Color(color);}
+        public void setTertiaryColor(@ColorInt int color){this.blue = new Color(color);}
 
         public PoliceLightsStyle getPoliceLightsStyle(){return style;}
-        public Color getPrimaryColor(){return this.red;}
-        public Color getSecondaryColor(){return this.white;}
-        public Color getTertiaryColor(){return this.blue;}
+        public @ColorInt int getPrimaryColor(){return this.red.toColorInt();}
+        public @ColorInt int getSecondaryColor(){return this.white.toColorInt();}
+        public @ColorInt int getTertiaryColor(){return this.blue.toColorInt();}
 
         @Override
         protected void updateAnimationSpecificValuesOverI2C(I2cDeviceSynchSimple deviceClient)
@@ -436,15 +494,15 @@ public class PrismAnimations {
         private int period           = 1000;
 
         public Pulse(){ super(AnimationType.PULSE); }
-        public Pulse(Color primaryColor) { 
+        public Pulse(@ColorInt int primaryColor) {
             this();
-            this.primaryColor = primaryColor;
+            this.primaryColor = new Color(primaryColor);
         }
-        public Pulse(Color primaryColor, Color secondaryColor) { 
+        public Pulse(@ColorInt int primaryColor, @ColorInt int secondaryColor) {
             this(primaryColor);
-            this.secondaryColor = secondaryColor;
+            this.secondaryColor = new Color(secondaryColor);
         }
-        public Pulse(Color primaryColor, Color secondaryColor, int period) { 
+        public Pulse(@ColorInt int primaryColor, @ColorInt int secondaryColor, int period) {
             this(primaryColor, secondaryColor);
             this.period = period;
         }
@@ -463,14 +521,14 @@ public class PrismAnimations {
         public void setPeriod(int duration, TimeUnit timeUnit){
             this.period = Math.toIntExact(timeUnit.toMillis(duration));
         }
-        public void setPrimaryColor(Color color)   { primaryColor = color;   }
-        public void setSecondaryColor(Color color) { secondaryColor = color; }
+        public void setPrimaryColor(@ColorInt int color)   { primaryColor = new Color(color);   }
+        public void setSecondaryColor(@ColorInt int color) { secondaryColor = new Color(color); }
         public void setPrimaryColor(int red, int green, int blue)   { primaryColor = new Color((byte)red, (byte)green, (byte)blue);   }
         public void setSecondaryColor(int red, int green, int blue) { secondaryColor = new Color((byte)red, (byte)green, (byte)blue); }
 
         public int getPeriod()           { return period;         }
-        public Color getPrimaryColor()   { return primaryColor;   }
-        public Color getSecondaryColor() { return secondaryColor; }
+        public @ColorInt int getPrimaryColor()   { return primaryColor.toColorInt();   }
+        public @ColorInt int getSecondaryColor() { return secondaryColor.toColorInt(); }
 
         @Override
         protected void updateAnimationSpecificValuesOverI2C(I2cDeviceSynchSimple deviceClient)
@@ -593,15 +651,15 @@ public class PrismAnimations {
             this(startHue, stopHue, numberOfSnakes, snakeLength, spacingBetween);
             this.repeatAfter = (byte)repeatAfter;
         }
-        public RainbowSnakes(float startHue, float stopHue, int numberOfSnakes, int snakeLength, int spacingBetween, int repeatAfter, Color backgroundColor){
+        public RainbowSnakes(float startHue, float stopHue, int numberOfSnakes, int snakeLength, int spacingBetween, int repeatAfter, @ColorInt int backgroundColor){
             this(startHue, stopHue, numberOfSnakes, snakeLength, spacingBetween, repeatAfter);
-            this.backgroundColor = backgroundColor;
+            this.backgroundColor = new Color(backgroundColor);
         }
-        public RainbowSnakes(float startHue, float stopHue, int numberOfSnakes, int snakeLength, int spacingBetween, int repeatAfter, Color backgroundColor, float speed){
+        public RainbowSnakes(float startHue, float stopHue, int numberOfSnakes, int snakeLength, int spacingBetween, int repeatAfter, @ColorInt int backgroundColor, float speed){
             this(startHue, stopHue, numberOfSnakes, snakeLength, spacingBetween, repeatAfter, backgroundColor);
             this.speed = speed;
         }
-        public RainbowSnakes(float startHue, float stopHue, int numberOfSnakes, int snakeLength, int spacingBetween, int repeatAfter, Color backgroundColor, float speed, Direction direction){
+        public RainbowSnakes(float startHue, float stopHue, int numberOfSnakes, int snakeLength, int spacingBetween, int repeatAfter, @ColorInt int backgroundColor, float speed, Direction direction){
             this(startHue, stopHue, numberOfSnakes, snakeLength, spacingBetween, repeatAfter, backgroundColor, speed);
             this.direction = direction;
         }
@@ -615,7 +673,7 @@ public class PrismAnimations {
         public int getRepeatAfter() { return repeatAfter; }
         public Direction getDirection() { return direction; }
         public int getSpacingBetween() { return spacingBetween; }
-        public Color getBackgroundColor() { return backgroundColor; }
+        public @ColorInt int getBackgroundColor() { return backgroundColor.toColorInt(); }
         public int getNumberOfSnakes()    { return numberOfSnakes;  }
 
         /**
@@ -743,27 +801,27 @@ public class PrismAnimations {
         private int period           = 1000;
 
         public SineWave(){ super(AnimationType.SINE_WAVE); }
-        public SineWave(Color primaryColor) { 
+        public SineWave(@ColorInt int primaryColor) {
             this();
-            this.primaryColor = primaryColor;
+            this.primaryColor = new Color(primaryColor);
         }
-        public SineWave(Color primaryColor, Color secondaryColor) { 
+        public SineWave(@ColorInt int primaryColor, @ColorInt int secondaryColor) {
             this(primaryColor);
-            this.secondaryColor = secondaryColor;
+            this.secondaryColor = new Color(secondaryColor);
         }
-        public SineWave(Color primaryColor, Color secondaryColor, int period) { 
+        public SineWave(@ColorInt int primaryColor, @ColorInt int secondaryColor, int period) {
             this(primaryColor, secondaryColor);
             this.period = period;
         }
-        public SineWave(Color primaryColor, Color secondaryColor, int period, float speed) {
+        public SineWave(@ColorInt int primaryColor, @ColorInt int secondaryColor, int period, float speed) {
             this(primaryColor, secondaryColor, period);
             this.speed = speed;
         }
-        public SineWave(Color primaryColor, Color secondaryColor, int period, float speed, float offset) {
+        public SineWave(@ColorInt int primaryColor, @ColorInt int secondaryColor, int period, float speed, float offset) {
             this(primaryColor, secondaryColor, period, speed);
             this.offset = offset;
         }
-        public SineWave(Color primaryColor, Color secondaryColor, int period, float speed, float offset, Direction direction) {
+        public SineWave(@ColorInt int primaryColor, @ColorInt int secondaryColor, int period, float speed, float offset, Direction direction) {
             this(primaryColor, secondaryColor, period, speed, offset);
             this.direction = direction;
         }
@@ -795,8 +853,8 @@ public class PrismAnimations {
          * @param offset from 0 to 1.
          */
         public void setOffset(float offset) { this.offset = offset; }
-        public void setPrimaryColor(Color color)      { primaryColor = color;       }
-        public void setSecondaryColor(Color color)    { secondaryColor = color;     }
+        public void setPrimaryColor(@ColorInt int color)      { primaryColor = new Color(color);       }
+        public void setSecondaryColor(@ColorInt int color)    { secondaryColor = new Color(color);     }
         public void setDirection(Direction direction) { this.direction = direction; }
         public void setPrimaryColor(int red, int green, int blue)   { primaryColor = new Color((byte)red, (byte)green, (byte)blue);   }
         public void setSecondaryColor(int red, int green, int blue) { secondaryColor = new Color((byte)red, (byte)green, (byte)blue); }
@@ -805,8 +863,8 @@ public class PrismAnimations {
         public float getSpeed() { return speed;  }
         public float getOffset(){ return offset; }
         public Direction getDirection()  { return direction;      }
-        public Color getPrimaryColor()   { return primaryColor;   }
-        public Color getSecondaryColor() { return secondaryColor; }
+        public @ColorInt int getPrimaryColor()   { return primaryColor.toColorInt();   }
+        public @ColorInt int getSecondaryColor() { return secondaryColor.toColorInt(); }
 
         @Override
         protected void updateAnimationSpecificValuesOverI2C(I2cDeviceSynchSimple deviceClient)
@@ -837,14 +895,14 @@ public class PrismAnimations {
         }
 
         public SingleFill(){ super(AnimationType.SINGLE_FILL); }
-        public SingleFill(Color... colors) {
+        public SingleFill(@ColorInt int... colors) {
             this();
-            this.colors = colors;
+            this.colors = toColorArray(colors);
         }
 
         public int getPeriod() { return period; }
         public float getSpeed()  { return speed; }
-        public Color[] getColors() { return colors; }
+        public @ColorInt int[] getColors() { return toColorIntArray(colors); }
         public int getPixelLength() { return pixelLength; }
         public Direction getDirection() { return direction; }
         public SingleFillStyle getStyle() { return style; }
@@ -869,13 +927,13 @@ public class PrismAnimations {
          * @param speed from 0 to 1.
          */
         public void setSpeed(float speed)        { this.speed = speed;   }
-        public void setColors(Color... colors) {
+        public void setColors(@ColorInt int... colors) {
             for(int i = 0; i < Math.min(colors.length,10); i++){
-                this.colors[i] = colors[i];
+                this.colors[i] = new Color(colors[i]);
             }
         }
         public void setPixelLength(int pixelLength)   { this.pixelLength = pixelLength; }
-        public void setStyle(SingleFillStyle style)   { this.style = style;             }    
+        public void setStyle(SingleFillStyle style)   { this.style = style;             }
         public void setDirection(Direction direction) { this.direction = direction;     }
 
         @Override
@@ -902,31 +960,31 @@ public class PrismAnimations {
 
         //region Constructors
         public Snakes(){ super(AnimationType.SNAKES); }
-        public Snakes(Color... colors) {
+        public Snakes(@ColorInt int... colors) {
             this();
-            this.colors = colors;
+            this.colors = toColorArray(colors);
         }
-        public Snakes(int snakeLength, Color... colors){
+        public Snakes(int snakeLength, @ColorInt int... colors){
             this(colors);
             this.snakeLength = (byte)snakeLength;
         }
-        public Snakes(int snakeLength, int spacingBetween, Color... colors){
+        public Snakes(int snakeLength, int spacingBetween, @ColorInt int... colors){
             this(snakeLength, colors);
             this.spacingBetween = (byte)spacingBetween;
         }
-        public Snakes(int snakeLength, int spacingBetween, int repeatAfter, Color... colors){
+        public Snakes(int snakeLength, int spacingBetween, int repeatAfter, @ColorInt int... colors){
             this(snakeLength, spacingBetween, colors);
             this.repeatAfter = (byte)repeatAfter;
         }
-        public Snakes(int snakeLength, int spacingBetween, int repeatAfter, Color backgroundColor, Color... colors){
+        public Snakes(int snakeLength, int spacingBetween, int repeatAfter, @ColorInt int backgroundColor, @ColorInt int... colors){
             this(snakeLength, spacingBetween, repeatAfter, colors);
-            this.backgroundColor = backgroundColor;
+            this.backgroundColor = new Color(backgroundColor);
         }
-        public Snakes(int snakeLength, int spacingBetween, int repeatAfter, Color backgroundColor, float speed, Color... colors){
+        public Snakes(int snakeLength, int spacingBetween, int repeatAfter, @ColorInt int backgroundColor, float speed, @ColorInt int... colors){
             this(snakeLength, spacingBetween, repeatAfter, backgroundColor, colors);
             this.speed = speed;
         }
-        public Snakes(int snakeLength, int spacingBetween, int repeatAfter, Color backgroundColor, float speed, Direction direction, Color... colors){
+        public Snakes(int snakeLength, int spacingBetween, int repeatAfter, @ColorInt int backgroundColor, float speed, Direction direction, @ColorInt int... colors){
             this(snakeLength, spacingBetween, repeatAfter, backgroundColor, speed, colors);
             this.direction = direction;
         }
@@ -934,19 +992,19 @@ public class PrismAnimations {
 
         //region Getters/Setters
         public float getSpeed()      { return speed;       }
-        public Color[] getColors()   { return colors;      }
+        public @ColorInt int[] getColors()   { return toColorIntArray(colors);      }
         public int getSnakeLength() { return snakeLength; }
         public int getRepeatAfter() { return repeatAfter; }
         public Direction getDirection() { return direction; }
         public int getSpacingBetween() { return spacingBetween; }
-        public Color getBackgroundColor() { return backgroundColor; }
+        public @ColorInt int getBackgroundColor() { return backgroundColor.toColorInt(); }
 
         /**
          * Sets the speed of the animation.
          * @param speed from 0 to 1.
          */
         public void setSpeed(float speed)      { this.speed = speed;  }
-        public void setColors(Color... colors) { this.colors = colors;}
+        public void setColors(@ColorInt int... colors) { this.colors = toColorArray(colors);}
         public void setDirection(Direction direction) { this.direction = direction;     }
 
         /**
@@ -986,26 +1044,26 @@ public class PrismAnimations {
         private Color primaryColor = Color.RED;
 
         public Solid(){super(AnimationType.SOLID);}
-        public Solid(Color primaryColor) { 
+        public Solid(@ColorInt int primaryColor) {
             super(AnimationType.SOLID);
-            this.primaryColor = primaryColor;
+            this.primaryColor = new Color(primaryColor);
         }
-        public Solid(Color primaryColor, int brightness) { 
+        public Solid(@ColorInt int primaryColor, int brightness) {
             super(AnimationType.SOLID, brightness);
-            this.primaryColor = primaryColor;
+            this.primaryColor = new Color(primaryColor);
         }
-        public Solid(Color primaryColor, int startIndex, int stopIndex){
+        public Solid(@ColorInt int primaryColor, int startIndex, int stopIndex){
             super(AnimationType.SOLID, startIndex, stopIndex);
-            this.primaryColor = primaryColor;
+            this.primaryColor = new Color(primaryColor);
         }
-        public Solid(Color primaryColor, int brightness, int startIndex, int stopIndex){
+        public Solid(@ColorInt int primaryColor, int brightness, int startIndex, int stopIndex){
             super(AnimationType.SOLID, brightness, startIndex, stopIndex);
-            this.primaryColor = primaryColor;
+            this.primaryColor = new Color(primaryColor);
         }
 
         public void setPrimaryColor(int red, int green, int blue) { primaryColor = new Color((byte)red, (byte)green, (byte)blue); }
-        public void setPrimaryColor(Color color) { primaryColor = color; }
-        public Color getPrimaryColor() { return primaryColor; }
+        public void setPrimaryColor(@ColorInt int color) { primaryColor = new Color(color); }
+        public @ColorInt int getPrimaryColor() { return primaryColor.toColorInt(); }
 
         @Override
         protected void updateAnimationSpecificValuesOverI2C(I2cDeviceSynchSimple deviceClient)
@@ -1022,15 +1080,15 @@ public class PrismAnimations {
 
         //region Constructors
         public Sparkle() { super(AnimationType.SPARKLE); }
-        public Sparkle(Color primaryColor){ 
+        public Sparkle(@ColorInt int primaryColor){
             this();
-            this.primaryColor = primaryColor;
+            this.primaryColor = new Color(primaryColor);
         }
-        public Sparkle(Color primaryColor, Color secondaryColor){ 
+        public Sparkle(@ColorInt int primaryColor, @ColorInt int secondaryColor){
             this(primaryColor); 
-            this.secondaryColor = secondaryColor;
+            this.secondaryColor = new Color(secondaryColor);
         }
-        public Sparkle(Color primaryColor, Color secondaryColor, int period){ 
+        public Sparkle(@ColorInt int primaryColor, @ColorInt int secondaryColor, int period){
             this(primaryColor, secondaryColor); 
             this.period = period;
         }
@@ -1038,8 +1096,8 @@ public class PrismAnimations {
 
         //region Getters/Setters
         public int getPeriod()         { return period;           }
-        public Color getPrimaryColor() { return primaryColor;     }
-        public Color getSecondaryColor() { return secondaryColor; }
+        public @ColorInt int getPrimaryColor() { return primaryColor.toColorInt();     }
+        public @ColorInt int getSecondaryColor() { return secondaryColor.toColorInt(); }
         public int getSparkleProbability() { return sparkleProbability; }
 
         /**
@@ -1047,8 +1105,8 @@ public class PrismAnimations {
          * @param period from 0 - 4,294,697,295. Larger is longer.
          */
         public void setPeriod(int period) { this.period = period; }
-        public void setPrimaryColor(Color primaryColor) { this.primaryColor = primaryColor; }
-        public void setSecondaryColor(Color secondaryColor) { this.secondaryColor = secondaryColor; }
+        public void setPrimaryColor(@ColorInt int primaryColor) { this.primaryColor = new Color(primaryColor); }
+        public void setSecondaryColor(@ColorInt int secondaryColor) { this.secondaryColor = new Color(secondaryColor); }
 
         /**
          * Sets the probability/density of sparkles. Lower is denser. Default is 16.

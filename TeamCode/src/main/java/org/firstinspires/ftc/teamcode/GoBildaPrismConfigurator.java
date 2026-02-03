@@ -24,10 +24,12 @@ package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.Prism.GoBildaPrismDriver.LayerHeight;
 
+import android.graphics.Color;
+import androidx.annotation.ColorInt;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Prism.Color;
 import org.firstinspires.ftc.teamcode.Prism.GoBildaPrismDriver;
 import org.firstinspires.ftc.teamcode.Prism.PrismAnimations;
 import org.firstinspires.ftc.teamcode.Prism.PrismAnimations.AnimationType;
@@ -84,7 +86,7 @@ public class GoBildaPrismConfigurator extends LinearOpMode {
     /*
      * An array of colors passed to the SingleFill animation.
      */
-    Color[] singleFillColors = {
+    @ColorInt int[] singleFillColors = {
         Color.RED, Color.WHITE, Color.BLUE
     };
 
@@ -1117,13 +1119,13 @@ public class GoBildaPrismConfigurator extends LinearOpMode {
      * changes, well the brightness.
      * Actually implementing this isn't very clean, but the result for the user is a better experience.
      */
-    public Color hsbViaJoystick(Color previousColor){
+    public @ColorInt int hsbViaJoystick(@ColorInt int previousColor){
         final float HUE_JOYSTICK_SCALAR = 5;
         final float SATURATION_JOYSTICK_SCALAR = 0.05F;
         final float BRIGHTNESS_JOYSTICK_SCALAR = 0.05f;
 
         float[] hsb = new float[3]; // Android graphics library wants an array containing RGB values.
-        android.graphics.Color.RGBToHSV(previousColor.red,previousColor.green,previousColor.blue,hsb);
+        Color.colorToHSV(previousColor, hsb);
 
         /*
          * Here we let the user increase or decrease H, S, or B with the joystick.
@@ -1137,8 +1139,7 @@ public class GoBildaPrismConfigurator extends LinearOpMode {
          * Here we create an integer where the Android graphics library will store each component of
          * our RGB color one-after-another. I hope we can agree that this is cursed.
          */
-        int colorInt = android.graphics.Color.HSVToColor(hsb);
-        Color color = new Color(0,0,0); // Create a new color to return.
+        @ColorInt int color = Color.HSVToColor(hsb);
 
         /*
          * One of the big downsides in this multi-color model is that some behavior isn't very
@@ -1152,9 +1153,6 @@ public class GoBildaPrismConfigurator extends LinearOpMode {
         }
         hsbTelemetry = String.format("Hue/Saturation/Brightness: %4.2f %4.2f %4.2f", hsb[0], hsb[1], hsb[2]);
 
-        color.red = android.graphics.Color.red(colorInt);
-        color.green = android.graphics.Color.green(colorInt);
-        color.blue = android.graphics.Color.blue(colorInt);
         return color;
     }
 
