@@ -31,6 +31,8 @@ import com.qualcomm.robotcore.hardware.I2cDeviceSynchDevice;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchSimple;
 import com.qualcomm.robotcore.hardware.configuration.annotations.DeviceProperties;
 import com.qualcomm.robotcore.hardware.configuration.annotations.I2cDeviceType;
+import org.firstinspires.ftc.robotcore.external.ExportEnumToBlocks;
+import org.firstinspires.ftc.robotcore.external.ExportToBlocks;
 
 import com.qualcomm.robotcore.util.TypeConversion;
 
@@ -77,6 +79,7 @@ public class GoBildaPrismDriver extends I2cDeviceSynchDevice<I2cDeviceSynchSimpl
         }
     }
 
+    @ExportEnumToBlocks
     public enum Artboard
     {
         ARTBOARD_0 (0,0),
@@ -197,6 +200,7 @@ public class GoBildaPrismDriver extends I2cDeviceSynchDevice<I2cDeviceSynchSimpl
     /**
      * @return 3 if device is functional.
      */
+    @ExportToBlocks(tooltip = "Returns 3 if device is functional.")
     public int getDeviceID(){
         //return readInt(Register.DEVICE_ID);
         byte[] packet = deviceClient.read(Register.DEVICE_ID.address, Register.DEVICE_ID.registerType.lengthBytes);
@@ -217,8 +221,9 @@ public class GoBildaPrismDriver extends I2cDeviceSynchDevice<I2cDeviceSynchSimpl
     }
 
     /**
-     * @return Hardware version of the device as a string.
+     * @return Firmware version of the device as a string.
      */
+    @ExportToBlocks(tooltip = "Returns the firmware version of the device as a string.")
     public String getFirmwareVersionString(){
         byte[] packet = deviceClient.read(Register.FIRMWARE_VERSION.address,Register.FIRMWARE_VERSION.registerType.lengthBytes);
         int[] output = new int[3];
@@ -238,6 +243,10 @@ public class GoBildaPrismDriver extends I2cDeviceSynchDevice<I2cDeviceSynchSimpl
         output[1] = packet[0];
         return output;
     }
+    /**
+     * @return Hardware version of the device as a string.
+     */
+    @ExportToBlocks(tooltip = "Returns the hardware version of the device as a string.")
     public String getHardwareVersionString(){
         byte[] packet = deviceClient.read(Register.HARDWARE_VERSION.address,Register.HARDWARE_VERSION.registerType.lengthBytes);
         int[] output = new int[2];
@@ -395,6 +404,9 @@ public class GoBildaPrismDriver extends I2cDeviceSynchDevice<I2cDeviceSynchSimpl
         deviceClient.write(Register.ARTBOARD_CONTROL.address, data);
     }
 
+    @ExportToBlocks(
+        tooltip = "Loads animations from the specified artboard.",
+        parameterLabels = {"artboard"})
     public void loadAnimationsFromArtboard(Artboard artboard)
     {
         byte[] data = {
